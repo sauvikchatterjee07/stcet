@@ -1,0 +1,122 @@
+name: Deploy STCET Frontend to TPHOST
+
+on:
+  push:
+    branches:
+      - main # deploy when you push to main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: Install dependencies
+        working-directory: ./
+        run: npm ci
+
+      - name: Build STCET frontend
+        working-directory: ./
+        env:
+          VITE_API_BASE: ${{ secrets.VITE_API_BASE }}
+        run: npm run build
+
+      - name: Copy files to TPHOST
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.DO_HOST }}
+          username: ${{ secrets.DO_USER }}
+          key: ${{ secrets.DO_KEY }}
+          source: "dist/*"
+          target: "~/stcet-frontend"
+          strip_components: 1
+
+      - name: Deploy STCET frontend on TPHOST
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DO_HOST }}
+          username: ${{ secrets.DO_USER }}
+          key: ${{ secrets.DO_KEY }}
+          script: |
+
+            sudo apt-get update
+
+            if ! command -v nginx >/dev/null 2>&1; then
+              sudo apt-get install -y nginx
+            fi
+
+            if ! command -v certbot >/dev/null 2>&1; then
+              sudo apt-get install -y certbot python3-certbot-nginx
+            fi
+
+            sudo mkdir -p /var/www/stcet.bengalcodingacademy.com
+
+            sudo cp -r ~/stcet-frontend/* /var/www/stcet.bengalcodingacademy.com/
+
+            sudo chown -R www-data:www-data /var/www/stcet.bengalcodingacademy.com
+            sudo chmod -R 755 /var/www/stcet.bengalcodingacademy.com
+
+            sudo tee /etc/nginx/sites-available/stcet.bengalcodingacademy.com <<EOL
+            server {
+                listen 80;
+                server_name stcet.bengalcodingacademy.com;
+
+                add_header X-Frame-Options "SAMEORIGIN" always;
+                add_header X-XSS-Protection "1; mode=block" always;
+                add_header X-Content-Type-Options "nosniff" always;
+                add_header Referrer-Policy "no-referrer-when-downgrade" always;
+                add_header Content-Security-Policy "default-src 'self' http: https: data: blob: 'unsafe-inline' 'unsafe-eval'" always;
+
+                gzip on;
+                gzip_vary on;
+                gzip_min_length 1024;
+                gzip_types text/plain text/css application/javascript application/json;
+
+                root /var/www/stcet.bengalcodingacademy.com;
+                index index.html;
+
+                location / {
+                    try_files \$uri \$uri/ /index.html;
+                }
+
+                location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+                    expires 1y;
+                    add_header Cache-Control "public, immutable";
+                    try_files \$uri =404;
+                }
+
+                location ~ /\. {
+                    deny all;
+                }
+            }
+            EOL
+
+            sudo ln -sf /etc/nginx/sites-available/stcet.bengalcodingacademy.com \
+                         /etc/nginx/sites-enabled/
+
+            sudo nginx -t
+
+            sudo systemctl restart nginx
+            sudo systemctl enable nginx
+
+            sleep 5
+
+            echo "=== STCET Frontend Deployment Complete ==="
+            echo "http://stcet.bengalcodingacademy.com"
+            echo "https://stcet.bengalcodingacademy.com (if SSL configured)"
+
+      - name: Cleanup
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DO_HOST }}
+          username: ${{ secrets.DO_USER }}
+          key: ${{ secrets.DO_KEY }}
+          script: |
+            rm -rf ~/stcet-frontend
