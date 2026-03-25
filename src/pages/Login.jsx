@@ -8,6 +8,7 @@ export default function Login() {
   const navigate = useNavigate();
   const { login } = useAuth();
   const [form, setForm] = useState({ email: "", password: "" });
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -108,19 +109,28 @@ export default function Login() {
 
             <label className="block space-y-2">
               <span className="text-sm text-white/68">Password</span>
-              <input
-                type="password"
-                required
-                value={form.password}
-                onChange={(event) =>
-                  setForm((current) => ({
-                    ...current,
-                    password: event.target.value,
-                  }))
-                }
-                className="stcet-input px-5 py-4"
-                placeholder="Your password"
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  required
+                  value={form.password}
+                  onChange={(event) =>
+                    setForm((current) => ({
+                      ...current,
+                      password: event.target.value,
+                    }))
+                  }
+                  className="stcet-input px-5 py-4 pr-20"
+                  placeholder="Your password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((current) => !current)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-white/72 hover:bg-white/10"
+                >
+                  {showPassword ? "Hide" : "Show"}
+                </button>
+              </div>
             </label>
 
             {error ? (
