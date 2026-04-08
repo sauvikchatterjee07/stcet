@@ -83,7 +83,7 @@ export default function TestList({ bucket: bucketProp }) {
 
   useEffect(() => {
     api
-      .get(`/stcet/tests?bucket=${bucket === "closed" ? "closed" : "open"}`)
+      .get(`/tests?bucket=${bucket === "closed" ? "closed" : "open"}`)
       .then((response) => setTests(response.data));
   }, [bucket]);
 

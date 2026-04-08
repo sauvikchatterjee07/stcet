@@ -89,9 +89,9 @@ export default function Dashboard() {
 
   async function loadDashboard() {
     const [summaryResponse, openResponse, closedResponse] = await Promise.all([
-      api.get("/stcet/tests/dashboard"),
-      api.get("/stcet/tests?bucket=open"),
-      api.get("/stcet/tests?bucket=closed"),
+      api.get("/tests/dashboard"),
+      api.get("/tests?bucket=open"),
+      api.get("/tests?bucket=closed"),
     ]);
 
     setSummary(summaryResponse.data);

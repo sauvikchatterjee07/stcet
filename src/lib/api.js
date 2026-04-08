@@ -1,6 +1,11 @@
 import axios from "axios";
 
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:4000/api";
+const rawApiBase =
+  import.meta.env.VITE_API_BASE ||
+  import.meta.env.VITE_API_BASE_URL ||
+  "http://localhost:4000/api/stcet";
+
+const API_BASE = rawApiBase.replace(/\/+$/, "");
 
 let logoutHandler = null;
 let isInitialCheck = true;
