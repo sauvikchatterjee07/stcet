@@ -13,14 +13,24 @@ export function AuthProvider({ children, navigate }) {
   }, [navigate]);
 
   async function checkAuth() {
+    console.log("[STCET Auth] checkAuth start", {
+      path: window.location.pathname,
+    });
+
     try {
       const response = await api.get("/me");
+      console.log("[STCET Auth] checkAuth success", response.data);
       if (response.data.authenticated && response.data.user) {
         setUser(response.data.user);
       } else {
         setUser(null);
       }
-    } catch {
+    } catch (error) {
+      console.error("[STCET Auth] checkAuth failed", {
+        status: error.response?.status,
+        data: error.response?.data,
+        message: error.message,
+      });
       setUser(null);
     } finally {
       setLoading(false);
@@ -36,13 +46,20 @@ export function AuthProvider({ children, navigate }) {
   }
 
   function login(payload) {
+    console.log("[STCET Auth] login state update", payload);
     setUser(payload.user);
   }
 
   async function logout() {
     try {
+      console.log("[STCET Auth] logout start");
       await api.post("/auth/logout");
-    } catch {
+    } catch (error) {
+      console.error("[STCET Auth] logout failed", {
+        status: error.response?.status,
+        data: error.response?.data,
+        message: error.message,
+      });
       // ignore logout errors
     }
 
