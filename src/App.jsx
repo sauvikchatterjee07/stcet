@@ -12,6 +12,8 @@ import TestList from "./pages/TestList";
 function Protected({ children }) {
   const { user, loading } = useAuth();
 
+  console.log("Inside protected function");
+
   if (loading) {
     return (
       <div className="stcet-shell flex min-h-screen items-center justify-center">
@@ -39,11 +41,23 @@ export default function App() {
               <AppShell>
                 <Routes>
                   <Route path="/" element={<Dashboard />} />
-                  <Route path="/tests/open" element={<TestList bucket="open" />} />
-                  <Route path="/tests/closed" element={<TestList bucket="closed" />} />
-                  <Route path="/tests/:testId/result" element={<ResultPage />} />
+                  <Route
+                    path="/tests/open"
+                    element={<TestList bucket="open" />}
+                  />
+                  <Route
+                    path="/tests/closed"
+                    element={<TestList bucket="closed" />}
+                  />
+                  <Route
+                    path="/tests/:testId/result"
+                    element={<ResultPage />}
+                  />
                   <Route path="/tests/:testId" element={<TestDetail />} />
-                  <Route path="/attempts/:attemptId" element={<AttemptPage />} />
+                  <Route
+                    path="/attempts/:attemptId"
+                    element={<AttemptPage />}
+                  />
                   <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
               </AppShell>

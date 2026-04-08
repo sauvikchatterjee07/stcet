@@ -14,7 +14,7 @@ export function AuthProvider({ children, navigate }) {
 
   async function checkAuth() {
     try {
-      const response = await api.get("/stcet/me");
+      const response = await api.get("/me");
       if (response.data.authenticated && response.data.user) {
         setUser(response.data.user);
       } else {
@@ -41,7 +41,7 @@ export function AuthProvider({ children, navigate }) {
 
   async function logout() {
     try {
-      await api.post("/stcet/auth/logout");
+      await api.post("/auth/logout");
     } catch {
       // ignore logout errors
     }

@@ -18,7 +18,7 @@ export default function Login() {
     setError("");
 
     try {
-      const response = await api.post("/stcet/auth/login", form);
+      const response = await api.post("/auth/login", form);
       login(response.data);
       navigate("/");
     } catch (requestError) {

@@ -60,7 +60,7 @@ export default function AttemptPage() {
   }, [attempt]);
 
   async function loadAttempt() {
-    const response = await api.get(`/stcet/attempts/${attemptId}`);
+    const response = await api.get(`/attempts/${attemptId}`);
     autoSubmitRef.current = false;
     setAttempt(response.data);
     if (response.data.status === "IN_PROGRESS") {
@@ -120,7 +120,7 @@ export default function AttemptPage() {
       const uploadedUrls = [];
 
       for (const file of files) {
-        const presign = await api.post("/stcet/uploads/presign", {
+        const presign = await api.post("/uploads/presign", {
           fileName: file.name,
           fileType: file.type,
         });
@@ -171,7 +171,7 @@ export default function AttemptPage() {
       };
 
       const response = await api.post(
-        `/stcet/tests/${attempt.test.id}/submit`,
+        `/tests/${attempt.test.id}/submit`,
         payload
       );
       setSecondsLeft(0);
@@ -191,7 +191,7 @@ export default function AttemptPage() {
 
     try {
       setRankLoading(true);
-      const response = await api.get(`/stcet/tests/${attempt.test.id}/rank`);
+      const response = await api.get(`/tests/${attempt.test.id}/rank`);
       setRankInfo(response.data);
     } catch (error) {
       alert(error.response?.data?.error || "Unable to load rank right now.");

@@ -27,7 +27,7 @@ export default function ResultPage() {
 
   useEffect(() => {
     api
-      .get(`/stcet/tests/${testId}/result-summary`)
+      .get(`/tests/${testId}/result-summary`)
       .then((response) => setResult(response.data));
   }, [testId]);
 

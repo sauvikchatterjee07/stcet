@@ -14,13 +14,13 @@ export default function TestDetail() {
   const [starting, setStarting] = useState(false);
 
   useEffect(() => {
-    api.get(`/stcet/tests/${testId}`).then((response) => setTest(response.data));
+    api.get(`/tests/${testId}`).then((response) => setTest(response.data));
   }, [testId]);
 
   async function handleStart() {
     try {
       setStarting(true);
-      const response = await api.post(`/stcet/tests/${testId}/start`);
+      const response = await api.post(`/tests/${testId}/start`);
       navigate(`/attempts/${response.data.id}`);
     } catch (error) {
       if (error.response?.status === 409 && error.response?.data?.attemptId) {
