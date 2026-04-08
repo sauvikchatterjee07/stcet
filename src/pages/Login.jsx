@@ -16,15 +16,30 @@ export default function Login() {
     event.preventDefault();
     setLoading(true);
     setError("");
+    console.log("[STCET Login] submit start", {
+      email: form.email,
+      apiBase: api.defaults.baseURL,
+    });
 
     try {
       const response = await api.post("/auth/login", form);
+      console.log("[STCET Login] submit success", response.data);
       login(response.data);
       navigate("/");
     } catch (requestError) {
-      setError(
-        requestError?.response?.data?.error || "Unable to login right now."
-      );
+      const resolvedError =
+        requestError?.response?.data?.error?.message ||
+        requestError?.response?.data?.error ||
+        "Unable to login right now.";
+
+      console.error("[STCET Login] submit failed", {
+        status: requestError?.response?.status,
+        data: requestError?.response?.data,
+        message: requestError?.message,
+        resolvedError,
+      });
+
+      setError(resolvedError);
     } finally {
       setLoading(false);
     }
