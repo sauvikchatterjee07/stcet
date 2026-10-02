@@ -400,7 +400,7 @@ export default function AttemptPage() {
             </p>
           </div>
 
-          <div className="rounded-[28px] bg-gradient-to-br from-stcet-gold to-[#ffc94f] px-6 py-4 text-center text-stcet-black">
+          <div className="rounded-[28px] bg-stcet-gold px-6 py-4 text-center text-stcet-black">
             <p className="text-xs uppercase tracking-[0.3em] text-black/60">
               Time Left
             </p>

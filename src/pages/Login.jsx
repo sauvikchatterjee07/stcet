@@ -48,7 +48,7 @@ export default function Login() {
   return (
     <div className="stcet-shell flex min-h-screen items-center justify-center px-4 py-10">
       <div className="grid w-full max-w-6xl gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-        <section className="stcet-panel stcet-hero rounded-[36px] p-8 lg:p-12">
+        <section className="stcet-panel stcet-hero order-2 rounded-[36px] p-8 lg:order-1 lg:p-12">
           <div className="relative z-10">
             <div className="flex items-center gap-4">
               <img
@@ -93,7 +93,7 @@ export default function Login() {
           </div>
         </section>
 
-        <section className="stcet-panel rounded-[36px] p-8 lg:p-10">
+        <section className="stcet-panel order-1 rounded-[36px] p-8 lg:order-2 lg:p-10">
           <p className="text-xs uppercase tracking-[0.35em] text-stcet-cyan">
             Student Login
           </p>
@@ -101,7 +101,7 @@ export default function Login() {
             Enter the STCET exam portal
           </h2>
           <p className="mt-3 text-white/62">
-            Use your Bengal Coding Academy credentials to access assigned tests.
+            Sign in with the Bengal Coding Academy account assigned to your STCET batch.
           </p>
 
           <form onSubmit={handleSubmit} className="mt-8 space-y-5">

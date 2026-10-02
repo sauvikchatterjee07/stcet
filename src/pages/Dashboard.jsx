@@ -110,7 +110,7 @@ export default function Dashboard() {
               onClick={() => setActiveTab("open")}
               className={`min-w-44 rounded-[20px] px-6 py-4 text-sm font-semibold transition-all ${
                 activeTab === "open"
-                  ? "bg-stcet-gold text-stcet-black shadow-[0_12px_28px_rgba(245,177,31,0.28)]"
+                  ? "bg-stcet-gold text-stcet-black shadow-[0_12px_28px_rgba(255,178,9,0.28)]"
                   : "text-white/70 hover:bg-white/5"
               }`}
             >
@@ -123,7 +123,7 @@ export default function Dashboard() {
               onClick={() => setActiveTab("closed")}
               className={`min-w-44 rounded-[20px] px-6 py-4 text-sm font-semibold transition-all ${
                 activeTab === "closed"
-                  ? "bg-stcet-cyan text-stcet-black shadow-[0_12px_28px_rgba(21,208,255,0.22)]"
+                  ? "bg-stcet-cyan text-stcet-black shadow-[0_12px_28px_rgba(0,195,255,0.22)]"
                   : "text-white/70 hover:bg-white/5"
               }`}
             >

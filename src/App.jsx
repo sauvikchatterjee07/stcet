@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
 
 import AppShell from "./components/AppShell";
+import ProgressiveReveal from "./components/ProgressiveReveal";
 import { AuthProvider, useAuth } from "./lib/authContext";
 import AttemptPage from "./pages/AttemptPage";
 import Dashboard from "./pages/Dashboard";
@@ -32,6 +33,7 @@ export default function App() {
 
   return (
     <AuthProvider navigate={navigate}>
+      <ProgressiveReveal />
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route
