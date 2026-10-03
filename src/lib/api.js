@@ -5,7 +5,7 @@ const rawApiBase =
   import.meta.env.VITE_API_BASE_URL ||
   "http://localhost:4000/api/stcet";
 
-const API_BASE = rawApiBase.replace(/\/+$/, "");
+export const API_BASE = rawApiBase.replace(/\/+$/, "");
 
 console.log("[STCET API] baseURL:", API_BASE);
 
@@ -57,7 +57,11 @@ api.interceptors.response.use(
 
     if (error.response?.status === 401 && !isInitialCheck) {
       if (window.location.pathname !== "/login" && logoutHandler) {
-        logoutHandler("Your session expired. Please login again.");
+        logoutHandler(
+          error.response.data?.code === "ACCOUNT_DISABLED"
+            ? error.response.data.error
+            : "Your session expired. Please login again."
+        );
       }
     }
 

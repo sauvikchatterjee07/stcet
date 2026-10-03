@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import { api } from "../lib/api";
+import { useStcetTestsLive } from "../lib/useRealtime";
 
 function formatDate(value) {
   return new Date(value).toLocaleString();
@@ -80,12 +81,24 @@ export default function TestList({ bucket: bucketProp }) {
   const params = useParams();
   const bucket = bucketProp || params.bucket || "open";
   const [tests, setTests] = useState([]);
+  const requestRef = useRef(0);
 
-  useEffect(() => {
+  const loadTests = useCallback(() => {
+    const request = ++requestRef.current;
     api
       .get(`/tests?bucket=${bucket === "closed" ? "closed" : "open"}`)
-      .then((response) => setTests(response.data));
+      .then((response) => {
+        // Ignores slower responses from an earlier bucket or an earlier change.
+        if (request === requestRef.current) setTests(response.data);
+      })
+      .catch(() => {});
   }, [bucket]);
+
+  useEffect(() => {
+    loadTests();
+  }, [loadTests]);
+
+  useStcetTestsLive(loadTests);
 
   const title = bucket === "closed" ? "Closed Tests" : "Open Tests";
   const description =

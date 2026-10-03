@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { api } from "../lib/api";
+import { useStcetTestsLive } from "../lib/useRealtime";
 
 function formatDate(value) {
   return new Date(value).toLocaleString();
@@ -82,21 +83,31 @@ export default function Dashboard() {
   const [summary, setSummary] = useState({ open: 0, closed: 0 });
   const [openTests, setOpenTests] = useState([]);
   const [closedTests, setClosedTests] = useState([]);
+  const requestRef = useRef(0);
 
   useEffect(() => {
     loadDashboard();
   }, []);
 
-  async function loadDashboard() {
-    const [summaryResponse, openResponse, closedResponse] = await Promise.all([
-      api.get("/tests/dashboard"),
-      api.get("/tests?bucket=open"),
-      api.get("/tests?bucket=closed"),
-    ]);
+  useStcetTestsLive(loadDashboard);
 
-    setSummary(summaryResponse.data);
-    setOpenTests(openResponse.data);
-    setClosedTests(closedResponse.data);
+  async function loadDashboard() {
+    const request = ++requestRef.current;
+    try {
+      const [summaryResponse, openResponse, closedResponse] = await Promise.all([
+        api.get("/tests/dashboard"),
+        api.get("/tests?bucket=open"),
+        api.get("/tests?bucket=closed"),
+      ]);
+      // Several admin edits in a row start overlapping reloads; keep only the newest.
+      if (request !== requestRef.current) return;
+
+      setSummary(summaryResponse.data);
+      setOpenTests(openResponse.data);
+      setClosedTests(closedResponse.data);
+    } catch {
+      // Keep the lists already on screen; the next change or reconnect retries.
+    }
   }
 
   const visibleTests = activeTab === "open" ? openTests : closedTests;

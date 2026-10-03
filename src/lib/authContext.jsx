@@ -1,6 +1,8 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 
 import { api, onLogout, setInitialCheckComplete } from "./api";
+import { realtime, RealtimeEvents } from "./realtime";
+import { useRealtimeEvent } from "./useRealtime";
 
 const AuthContext = createContext(null);
 
@@ -35,15 +37,47 @@ export function AuthProvider({ children, navigate }) {
     } finally {
       setLoading(false);
       setInitialCheckComplete();
-      onLogout((message) => {
-        setUser(null);
-        navigate("/login");
-        if (message) {
-          alert(message);
-        }
-      });
+      onLogout(endSession);
     }
   }
+
+  // A revoked session can be reported by the socket and by several requests at once.
+  const userRef = useRef(user);
+  userRef.current = user;
+
+  function endSession(message) {
+    if (!userRef.current) return;
+    userRef.current = null;
+    setUser(null);
+    navigate("/login");
+    if (message) {
+      alert(message);
+    }
+  }
+
+  useEffect(() => {
+    if (!user?.id) return undefined;
+    realtime.connect();
+    return () => realtime.disconnect();
+  }, [user?.id]);
+
+  useRealtimeEvent(RealtimeEvents.USER_UPDATED, (profile) => {
+    setUser((current) =>
+      current && current.id === profile.id
+        ? { ...current, name: profile.name, email: profile.email, role: profile.role }
+        : current
+    );
+  });
+
+  useRealtimeEvent(RealtimeEvents.SESSION_ENDED, ({ reason } = {}) => {
+    // The server already rejects this cookie; clearing it stops it being sent at all.
+    api.post("/auth/logout").catch(() => {});
+    endSession(
+      reason === "deactivated"
+        ? "Your account has been deactivated. Please contact Bengal Coding Academy support."
+        : "Your account is no longer available."
+    );
+  });
 
   function login(payload) {
     console.log("[STCET Auth] login state update", payload);
